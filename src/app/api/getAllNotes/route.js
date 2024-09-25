@@ -2,7 +2,7 @@ import client from '../../../../connectToDatabase';
 
 export async function GET() {
     try {
-        const result = await client.query('SELECT * FROM notes ');
+        const result = await client.query('SELECT * FROM notes ORDER BY id');
         if (result.rows.length) {
             return new Response(JSON.stringify(result.rows), {
                 status: 200

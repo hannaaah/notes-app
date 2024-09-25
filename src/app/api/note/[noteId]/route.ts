@@ -20,7 +20,7 @@ export async function PUT(req: NextRequest, { params }: { params: { noteId: stri
         const noteId = Number(params.noteId);
         const noteToBeUpdated: Note = await req.json();
         const result = await client.query(`UPDATE notes SET title=$1, data=$2, date=$3 WHERE id = $4`,
-            [noteToBeUpdated.title, noteToBeUpdated.data, noteToBeUpdated.date, noteId]);
+            [noteToBeUpdated.title, noteToBeUpdated.data, Date().slice(0, 24), noteId]);
         if (result.rowCount)
             return new Response(JSON.stringify(`Updated note ${params.noteId}`), { status: 200 });
         else
