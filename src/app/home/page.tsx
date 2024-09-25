@@ -62,17 +62,13 @@ export default function HomePage() {
   }
 
   async function addNewNote() {
-    const _newNoteId = allNotes[allNotes.length - 1].id + 1;
-    console.log(_newNoteId);
     try {
-      const result = await fetch(
-        `http://localhost:3000/api/note/${_newNoteId}`,
-        {
-          method: "POST",
-          body: JSON.stringify(newNote),
-        }
-      );
+      const result = await fetch(`http://localhost:3000/api/note`, {
+        method: "POST",
+        body: JSON.stringify(newNote),
+      });
       if (result.ok) {
+        const _newNoteId = await result.json();
         handleEditNote({
           id: _newNoteId,
           title: "",
@@ -126,14 +122,10 @@ export default function HomePage() {
       if (response.ok) {
         let _data: Note[] = (await response.json()) as Note[];
         setAllNotes(_data);
-        console.log("Data is");
-        console.log(_data);
         _data.sort(
           (note1, note2) =>
             new Date(note2.date).getTime() - new Date(note1.date).getTime()
         );
-        console.log("Sorted Data is");
-        console.log(_data);
         setFilteredNotes(_data);
       } else throw new Error("Failed to get notes");
     } catch (error) {
