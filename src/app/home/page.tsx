@@ -14,12 +14,24 @@ export default function HomePage() {
   const [selectedNoteId, setSelectedNoteId] = useState<Number>();
   const [selectedNoteTitle, setSelectedNoteTitle] = useState("");
   const [selectedNoteData, setSelectedNoteData] = useState("");
+  const [selectedNoteDate, setSelectedNoteDate] = useState("");
   const [prevNote, setPrevNote] = useState<Note>();
   const [searchText, setSearchText] = useState("");
+  const [isNoteEdited, setIsNoteEdited] = useState<Boolean>();
 
   // function handleEditNote(title: string) {
   //   router.push(`/${title}`);
   // }
+
+  function isNoteEditedFunc(_selectedNoteId: any) {
+    let noteTocheck = allNotes.find((note) => note.id == _selectedNoteId);
+    if (
+      noteTocheck?.title != selectedNoteTitle ||
+      noteTocheck?.data != selectedNoteData
+    )
+      return true;
+    else return false;
+  }
 
   function handleEditNote(_noteSelected: Note) {
     setPrevNote(
@@ -28,13 +40,17 @@ export default function HomePage() {
             id: Number(selectedNoteId),
             title: selectedNoteTitle,
             data: selectedNoteData,
-            date: Date().slice(0, 24),
+            date: selectedNoteDate,
           }
         : prevNote
     );
+
+    setIsNoteEdited(isNoteEditedFunc(selectedNoteId));
+
     setSelectedNoteId(_noteSelected.id);
     setSelectedNoteTitle(_noteSelected.title);
     setSelectedNoteData(_noteSelected.data);
+    setSelectedNoteDate(_noteSelected.date);
   }
 
   function handleSearchNote(e: any) {
@@ -46,16 +62,13 @@ export default function HomePage() {
   }
 
   async function addNewNote() {
-    const _newNoteId = allNotes[allNotes.length - 1].id + 1;
     try {
-      const result = await fetch(
-        `http://localhost:3000/api/note/${_newNoteId}`,
-        {
-          method: "POST",
-          body: JSON.stringify(newNote),
-        }
-      );
+      const result = await fetch(`http://localhost:3000/api/note`, {
+        method: "POST",
+        body: JSON.stringify(newNote),
+      });
       if (result.ok) {
+        const _newNoteId = await result.json();
         handleEditNote({
           id: _newNoteId,
           title: "",
@@ -70,7 +83,7 @@ export default function HomePage() {
 
   async function updateNote() {
     try {
-      if (prevNote) {
+      if (isNoteEdited) {
         const response = await fetch(
           `http://localhost:3000/api/note/${prevNote?.id}`,
           {
@@ -119,6 +132,7 @@ export default function HomePage() {
       console.error("Error getting notes:", error);
     }
   }
+
   useEffect(() => {
     // getAllNotes();
     updateNote();
@@ -132,7 +146,6 @@ export default function HomePage() {
       <div
         className="leftpane"
         style={{
-          // width: "410px",
           border: "solid",
           borderWidth: "1px",
           borderColor: "gray",
@@ -247,7 +260,7 @@ export default function HomePage() {
           ></textarea>
         </div>
         <div className="notes-list" style={{ paddingTop: "13px" }}>
-          {filteredNotes.map((note, index) => (
+          {filteredNotes.map((note) => (
             <div key={note.id}>
               <div
                 className="note-tile"
@@ -284,6 +297,10 @@ export default function HomePage() {
                       fontSize: "14px",
                       paddingTop: "2px",
                       paddingBottom: "3px",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      maxWidth: "250px",
                     }}
                   >
                     {note.data}
@@ -370,14 +387,13 @@ export default function HomePage() {
             display: "flex",
             flexDirection: "row",
             justifyContent: "center",
-            // paddingLeft: "500px",
             paddingTop: "400px",
             fontSize: "28px",
             fontWeight: "bold",
             flex: "75%",
           }}
         >
-          <h1>Welcome to notes</h1>
+          <h1>Welcome to Notes</h1>
         </div>
       )}
     </main>
