@@ -297,6 +297,10 @@ export default function HomePage() {
                       fontSize: "14px",
                       paddingTop: "2px",
                       paddingBottom: "3px",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      maxWidth: "250px",
                     }}
                   >
                     {note.data}
